@@ -8,17 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
-#import "ZXingWidgetController.h"
 
-@interface CDVBarcodeScanner : CDVPlugin <ZXingDelegate>{
-
+@interface CDVBarcodeScanner : CDVPlugin {
+    
 }
 
 @property (nonatomic, copy) NSString* callbackId;
 
 - (void)scan:(CDVInvokedUrlCommand*)command;
-
-- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled;
-- (void)returnError:(NSString*)message;
 
 @end

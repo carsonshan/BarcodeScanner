@@ -4,12 +4,25 @@
 //
 //  Created by Jonathan Nunez Aguin on 30/09/2013.
 //
+// Modified by Christophe Fondacci so that the scan controller is placed below the webview
+// and remains active after a scan. A new "dismiss" method could be explicitly called
+// to dismiss the controller.
+//
+// Also note that after a successful scan, the control is passed back to JS through the success
+// callback. Even if the barcode scanner remains visible, the JS need to make another call to "scan"
+// again so that the controller will detect barcodes again.
 //
 
 #import "CDVBarcodeScanner.h"
+#import "CustomBarcodeViewController.h"
 
-@implementation CDVBarcodeScanner
+@implementation CDVBarcodeScanner {
+    
+    // Custom controller
+    CustomBarcodeViewController * widgetController;
+}
 
+@class OverlayView;
 @synthesize callbackId = _callbackId;
 
 
@@ -17,60 +30,39 @@
     
     self.callbackId = command.callbackId;
     
-    ZXingWidgetController *widgetController = [[ZXingWidgetController alloc] initWithDelegate:self showCancel:YES OneDMode:NO showLicense: NO];
-    
-    widgetController.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
-    
-    [self.viewController presentModalViewController:widgetController animated:YES];
+    // We instantiate our barcode scanner controller only if not yet created
+    if(widgetController == nil) {
+        
+        // Creating
+        widgetController = [[CustomBarcodeViewController alloc] initWithPlugin:self callbackId:command.callbackId];
+        // Presenting
+        [self.viewController presentModalViewController:widgetController animated:YES];
+    }  else {
+        // If we already have it, then we only reset it (i.e. prepare it for a new scan)
+        [widgetController reset];
+    }
 }
 
-- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled{
-    
-    NSNumber* cancelledNumber = [NSNumber numberWithInt:(cancelled?1:0)];
-    
-    NSMutableDictionary* resultDict = [[NSMutableDictionary alloc] init];
-    [resultDict setObject:scannedText     forKey:@"text"];
-    [resultDict setObject:format          forKey:@"format"];
-    [resultDict setObject:cancelledNumber forKey:@"cancelled"];
-    
-    CDVPluginResult* result = [CDVPluginResult
-                               resultWithStatus: CDVCommandStatus_OK
-                               messageAsDictionary: resultDict
-                               ];
-    
-    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-}
 
-- (void)returnError:(NSString*)message{
+- (void)dismiss:(CDVInvokedUrlCommand*)command{
     
-    CDVPluginResult* result = [CDVPluginResult
-                               resultWithStatus: CDVCommandStatus_ERROR
-                               messageAsString: message
-                               ];
+    self.callbackId = command.callbackId;
     
-    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-}
-
-#pragma mark -
-#pragma mark ZXingDelegate
-
-- (void)zxingController:(ZXingWidgetController*)controller didScanResult:(NSString *)result format: (NSString*)format{
-
-    [self.viewController dismissModalViewControllerAnimated: YES];
-    
-    [self returnSuccess:result format:format cancelled: NO];
-}
-
-- (void)zxingControllerDidCancel:(ZXingWidgetController*)controller{
-    
-    [self.viewController dismissModalViewControllerAnimated: YES];
-    
-    [self returnSuccess:@"" format:@"" cancelled: YES];
-}
-
-- (BOOL)zxingController:(ZXingWidgetController*)controller shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
- 
-    return [self.viewController shouldAutorotateToInterfaceOrientation: interfaceOrientation];
+    // Only if controller already instantiated
+    if(widgetController != nil) {
+        
+        // Detaching webview
+        [self.webView removeFromSuperview];
+        
+        // Dismissing barcode scanner controller
+        [widgetController dismissModalViewControllerAnimated:YES];
+        
+        // Reattaching webview
+        [self.viewController.view addSubview:self.webView];
+        
+        // No current barcode scanner controller
+        widgetController = nil;
+    }
 }
 
 @end

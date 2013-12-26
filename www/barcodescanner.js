@@ -43,6 +43,15 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback) {
 
     cordova.exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', []);
 };
+//-------------------------------------------------------------------
+BarcodeScanner.prototype.dismiss = function (successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        }
+    }           
+    cordova.exec(successCallback, errorCallback, 'BarcodeScanner', 'dismiss', []);
+};
+
 
 //-------------------------------------------------------------------
 BarcodeScanner.prototype.encode = function (type, data, successCallback, errorCallback, options) {
