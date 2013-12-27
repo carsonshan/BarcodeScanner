@@ -25,7 +25,9 @@
 		<resource-file src="src/ios/beep-beep.aiff" />
 
 		<header-file src="src/ios/CDVBarcodeScanner.h"/>
-        <source-file src="src/ios/CDVBarcodeScanner.mm"/>
+		<source-file src="src/ios/CDVBarcodeScanner.mm"/>
+		<header-file src="src/ios/CustomBarcodeViewController.h"/>
+		<source-file src="src/ios/CustomBarcodeViewController.m"/>
 
         <header-file src="src/ios/ZXingWidgetController.h"/>
         <resource-file src="src/ios/empty.cpp"/>
