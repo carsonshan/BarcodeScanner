@@ -24,6 +24,8 @@
     if (self) {
         plugin = thePlugin;
         callbackId = theCallbackId;
+        plugin.webView.backgroundColor = [UIColor clearColor];
+        plugin.webView.opaque=NO;
         
         // Uncomment to add sound
 //        widgetController.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
