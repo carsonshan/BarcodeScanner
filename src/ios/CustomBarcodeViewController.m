@@ -13,7 +13,6 @@
 @end
 
 @implementation CustomBarcodeViewController {
-    ZXingWidgetController *widgetController;
     CDVPlugin *plugin;
     NSString *callbackId;
 }
@@ -24,11 +23,13 @@
     if (self) {
         plugin = thePlugin;
         callbackId = theCallbackId;
+	[self setOverlayView:nil];
+	// Unfortunately these lines have no effect
         plugin.webView.backgroundColor = [UIColor clearColor];
         plugin.webView.opaque=NO;
         
         // Uncomment to add sound
-//        widgetController.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
+//        self.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
 
     }
     return self;
